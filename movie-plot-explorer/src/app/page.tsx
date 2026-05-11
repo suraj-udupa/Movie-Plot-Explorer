@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { MovieMatchResult } from '@/lib/schemas/validation';
 import { Loader2, Search, Star, Film, Users, Send } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function Dashboard() {
   const [plot, setPlot] = useState('');
@@ -104,9 +106,9 @@ export default function Dashboard() {
       <header className="mb-8 border-b border-neutral-800 pb-4">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-3">
           <Film className="text-pink-500" />
-          AI Movie Matcher
+          AI Screen Matcher
         </h1>
-        <p className="text-neutral-400 mt-2">Describe a movie plot in your head, and we'll find real movies that match it!</p>
+        <p className="text-neutral-400 mt-2">Describe a plot in your head, and we'll find real movies, TV shows, and web series that match it!</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -225,8 +227,16 @@ export default function Dashboard() {
                   ) : (
                     chatHistory.map((msg, i) => (
                       <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-2xl p-3 px-5 text-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-pink-600 text-white' : 'bg-neutral-800 text-neutral-200'}`}>
-                          {msg.content}
+                        <div className={`max-w-[90%] rounded-2xl p-3 px-5 text-sm ${msg.role === 'user' ? 'bg-pink-600 text-white whitespace-pre-wrap' : 'bg-neutral-800 text-neutral-200'}`}>
+                          {msg.role === 'assistant' ? (
+                            <div className="prose prose-invert max-w-none prose-sm prose-p:leading-relaxed prose-headings:mb-2 prose-table:w-full prose-th:border-b prose-th:border-neutral-600 prose-th:p-2 prose-td:p-2 prose-td:border-b prose-td:border-neutral-700">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {msg.content}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            msg.content
+                          )}
                           {msg.role === 'assistant' && msg.content === '' && chatStreaming && (
                             <Loader2 className="animate-spin w-4 h-4 inline" />
                           )}
